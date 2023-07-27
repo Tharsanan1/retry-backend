@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend-retry-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend-retry
+  template:
+    metadata:
+      labels:
+        app: backend-retry
+    spec:
+      containers:
+        - name: your-container-name
+          image: tharsanan/retry-backend:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 3000
+          resources:
+            requests:
+              cpu: "100m"  
+              memory: "128Mi" 
+            limits:
+              cpu: "500m" 
+              memory: "512Mi"
+          livenessProbe:
+            httpGet:
+              path: /health  # The path to your health endpoint
+              port: 3000  # Port to be used for the health check
+            initialDelaySeconds: 15  # Wait 15 seconds before the first probe
+            periodSeconds: 10  # Check the health every 10 seconds
+          readinessProbe:
+            httpGet:
+              path: /health  # The path to your health endpoint
+              port: 3000  # Port to be used for the health check
+            initialDelaySeconds: 5  # Wait 5 seconds before the first probe
+            periodSeconds: 5  # Check the health every 5 seconds 
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-retry
+spec:
+  selector:
+    app: backend-retry
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000  # Replace with the port your Node.js app listens on
