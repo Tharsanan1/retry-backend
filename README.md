@@ -20,7 +20,7 @@ npm install
 3. Start the Node.js server:
 
 ```bash
-node app.js
+node server.js
 ```
 
 The server will be running at `http://localhost:3000`.
